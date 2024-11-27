@@ -1,0 +1,9 @@
+qs:
+  repos:
+    - path: .
+      name: repo
+  framework: framework.sh
+  templates:
+    - repo/tools/install_keychain.sh
+    - docker/install_docker.sh
+    - install_docker_compose.sh
