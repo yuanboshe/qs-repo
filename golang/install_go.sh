@@ -1,10 +1,12 @@
 #!/bin/bash
 
-# 安装或升级 Go 到指定版本
+# @description 安装或升级 Go 到指定版本
 
-# 定义变量
-VERSION="1.23.0"
+# @arg golang version，default "latest" (leave empty also means "latest")
+VERSION="latest"
+# @arg goroot, default "$HOME/.go"
 GOROOT="$HOME/.go"
+# @arg gopath, default "$HOME/go"
 GOPATH="$HOME/go"
 
 print_error() {
@@ -86,7 +88,7 @@ setup_go() {
 }
 
 main() {
-  local version=${1:-"latest"}
+  local version=${VERSION:-"latest"}
   local platform="$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m | sed 's/x86_64/amd64/;s/i[3-6]86/386/')"
 
   if [[ "$version" == "latest" ]]; then
@@ -99,7 +101,7 @@ main() {
     exit 1
   fi
 
-  setup_go "$version" "$platform" "$2" "$3"
+  setup_go "$version" "$platform" "$GOROOT" "$GOPATH"
 }
 
-main "$VERSION" "$GOROOT" "$GOPATH"
+main

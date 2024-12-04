@@ -1,5 +1,7 @@
 #!/bin/bash
-# 安装 docker-compose
+
+# @description 安装 docker-compose
+
 if ! command -v docker-compose &>/dev/null; then
   echo "Installing docker-compose..."
   # 使用 curl 下载 docker-compose

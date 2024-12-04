@@ -2,8 +2,11 @@ qs:
   repos:
     - path: .
       name: repo
-  framework: framework.sh
   templates:
     - repo/tools/install_keychain.sh
+    - golang/install_go.sh
     - docker/install_docker.sh
     - install_docker_compose.sh
+
+repo/golang/install_go.sh:
+  version: 1.23.0

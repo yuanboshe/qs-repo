@@ -1,5 +1,7 @@
 #!/bin/bash
-# 安装 docker
+
+# @description 安装 docker
+
 if ! command -v docker &>/dev/null; then
   echo "Installing Docker..."
   curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
