@@ -9,7 +9,9 @@ qs:
     - verify_docker.sh
 
 repo/docker/configure_docker_daemon.sh:
-  registry_mirrors: ""
+  registry_mirrors: auto
+  mirror_auto_yes: "true"
+  mirror_verify_image: hello-world
 
 repo/docker/verify_docker.sh:
   run_hello_world: "false"
