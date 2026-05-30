@@ -1,0 +1,15 @@
+qs:
+  repos:
+    - path: .
+      name: repo
+  templates:
+    - docker/install_docker.sh
+    - configure_docker_daemon.sh
+    - install_docker_compose.sh
+    - verify_docker.sh
+
+repo/docker/configure_docker_daemon.sh:
+  registry_mirrors: ""
+
+repo/docker/verify_docker.sh:
+  run_hello_world: "false"

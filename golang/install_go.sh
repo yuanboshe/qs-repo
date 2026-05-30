@@ -1,6 +1,11 @@
 #!/bin/bash
 
 # @description 安装或升级 Go 到指定版本
+# @platform linux
+# @shell bash
+# @requires curl tar sed
+# @effects package-install user-file:$HOME/.bashrc
+# @network go.dev
 
 # @arg golang version，default "latest" (leave empty also means "latest")
 VERSION="latest"

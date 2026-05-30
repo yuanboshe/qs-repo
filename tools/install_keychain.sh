@@ -1,6 +1,10 @@
 #!/bin/bash
 
 # @description 安装 keychain
+# @platform linux/ubuntu linux/debian
+# @shell bash
+# @requires sudo apt-get
+# @effects package-install user-file:$HOME/.bashrc
 
 if ! command -v keychain &>/dev/null; then
   echo "Installing keychain ..."

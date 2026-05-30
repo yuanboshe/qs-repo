@@ -1,0 +1,12 @@
+apt_mirror: auto
+apt_mirror_fallbacks: https://mirrors.aliyun.com/docker-ce/linux/{os}
+apt_channel: stable
+docker_users: auto
+enable_service: "true"
+install_legacy_wrapper: "true"
+registry_mirrors: ""
+log_max_size: 100m
+log_max_file: "3"
+live_restore: "true"
+restart_docker: "true"
+run_hello_world: "false"
