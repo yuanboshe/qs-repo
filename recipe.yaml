@@ -4,14 +4,9 @@ qs:
       name: repo
   templates:
     - docker/install_docker.sh
-    - configure_docker_daemon.sh
-    - install_docker_compose.sh
-    - verify_docker.sh
+    - docker/configure_docker_daemon.sh
+    - docker/install_docker_compose.sh
+    - docker/verify_docker.sh
 
 repo/docker/configure_docker_daemon.sh:
-  registry_mirrors: auto
   mirror_auto_yes: "true"
-  mirror_verify_image: hello-world
-
-repo/docker/verify_docker.sh:
-  run_hello_world: "false"

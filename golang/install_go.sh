@@ -7,11 +7,11 @@
 # @effects package-install user-file:$HOME/.bashrc
 # @network go.dev
 
-# @arg golang version，default "latest" (leave empty also means "latest")
+# @arg Go 版本号，latest 或空值均表示安装最新稳定版
 VERSION="latest"
-# @arg goroot, default "$HOME/.go"
+# @arg Go 安装目录（GOROOT）
 GOROOT="$HOME/.go"
-# @arg gopath, default "$HOME/go"
+# @arg Go 工作空间（GOPATH）
 GOPATH="$HOME/go"
 
 print_error() {
