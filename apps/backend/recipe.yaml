@@ -1,0 +1,3 @@
+qs:
+  templates:
+    - should-not-be-listed.sh

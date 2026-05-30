@@ -1,0 +1,34 @@
+qs:
+  repos:
+    - path: .
+      name: fixture
+  framework: framework.sh
+  templates:
+    - fixture/apps/backend/install.sh
+    - report.sh
+    - apps/frontend/build.sh
+    - tools/check.sh
+    - legacy/legacy.sh
+
+fixture:
+  repo_only: recipe-repo
+
+fixture/apps:
+  dir_only: recipe-apps
+
+fixture/apps/backend:
+  dir_only: recipe-backend
+  recipe_override: recipe-backend
+
+fixture/apps/backend/install.sh:
+  recipe_override: recipe-install-template
+  template_only: recipe-install-template
+
+fixture/apps/backend/report.sh:
+  report_mode: recipe-report
+
+fixture/apps/frontend/build.sh:
+  frontend_only: recipe-frontend
+
+fixture/legacy/legacy.sh:
+  legacy_recipe: recipe-legacy

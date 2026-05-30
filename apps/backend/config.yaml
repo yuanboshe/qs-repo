@@ -1,0 +1,6 @@
+shared: backend-config
+backend_only: backend-config
+dir_only: backend-config
+recipe_override: backend-config
+template_only: backend-config
+report_mode: backend-config

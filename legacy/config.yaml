@@ -1,0 +1,6 @@
+arg:
+  legacy_common: legacy-arg
+  legacy_template: legacy-arg
+
+arg/legacy.sh:
+  legacy_template: legacy-template-arg

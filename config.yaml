@@ -1,0 +1,9 @@
+shared: root-config
+root_only: root-config
+app_only: root-config
+backend_only: root-config
+dir_only: root-config
+template_only: root-config
+recipe_override: root-config
+frontend_only: root-config
+legacy_common: root-config
