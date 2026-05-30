@@ -32,3 +32,4 @@ fixture/apps/frontend/build.sh:
 
 fixture/legacy/legacy.sh:
   legacy_recipe: recipe-legacy
+  legacy_template: legacy-template-arg

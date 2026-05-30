@@ -1,5 +1,6 @@
-shared: apps-config
-app_only: apps-config
-backend_only: apps-config
-dir_only: apps-config
-frontend_only: apps-config
+args:
+  shared: apps-config
+  app_only: apps-config
+  backend_only: apps-config
+  dir_only: apps-config
+  frontend_only: apps-config
