@@ -1,6 +1,6 @@
 # QS config hierarchy fixture
 
-这是一个 orphan 分支上的 QS 测试组件库，用于验证 `recipe.yaml` 默认入口名和多级 `config.yaml` 参数覆盖规则。
+这是一个 orphan 分支上的 QS 远程测试组件库，用于验证真实 GitHub repo/tree/blob/raw/git+ 输入、`recipe.yaml` 默认入口名、多级 `config.yaml` 参数覆盖规则和 repo cache 行为。
 
 ## 覆盖场景
 
@@ -9,21 +9,30 @@
 - template 中 `# @arg` 的默认值覆盖目录 `config.yaml`。
 - recipe 中的 repo 级、目录级、template 级参数覆盖前面所有默认值。
 - `qs.templates` 同时覆盖完整 ID、多级相对 ID、两段 ID 和一段复用上下文 ID。
-- 旧式 `arg` / `arg/<template>` config 仍可被读取。
-- 隐藏目录、隐藏文件、目录内 `recipe.yaml` 和 `config.yaml` 不应被 `qs list templates` 当成 template。
+- GitHub repo/tree 输入应下载 repo snapshot，并在 `render` / `run` 中默认读取根目录 `recipe.yaml`。
+- GitHub blob/raw `recipe.yaml` 输入在需要 repo 上下文时应下载 repo snapshot，并让 `repos[].path: .` 指向 snapshot 根目录。
+- `git+https://github.com/yuanboshe/qs-repo.git@test-repo` 应默认读取根目录 `recipe.yaml`。
+- 隐藏目录、隐藏文件、目录内 `recipe.yaml` 和 `config.yaml` 不应被 `qs inspect` 当成 template。
 
 ## 验证命令
 
+本地 fixture 验证：
+
 ```sh
-qs explain ./recipe.yaml --json
-qs list templates ./recipe.yaml --json
-qs render ./recipe.yaml -o ./_tmp-fixture.sh
+qs inspect . --json
+qs inspect ./recipe.yaml --json
+qs render . -o ./_tmp-fixture.sh
 ```
 
-也可以验证目录默认入口：
+真实远程验证：
 
 ```sh
-qs explain . --json
+go build -o _tmp\qs.exe .
+$env:QS_HOME=(Resolve-Path _tmp).Path + '\qs-remote-smoke-tree'; .\_tmp\qs.exe inspect https://github.com/yuanboshe/qs-repo/tree/test-repo --json
+$env:QS_HOME=(Resolve-Path _tmp).Path + '\qs-remote-smoke-render'; .\_tmp\qs.exe render https://github.com/yuanboshe/qs-repo/tree/test-repo -o .\_tmp\remote-test-repo.sh
+$env:QS_HOME=(Resolve-Path _tmp).Path + '\qs-remote-smoke-blob'; .\_tmp\qs.exe render https://github.com/yuanboshe/qs-repo/blob/test-repo/recipe.yaml -o .\_tmp\remote-blob.sh
+$env:QS_HOME=(Resolve-Path _tmp).Path + '\qs-remote-smoke-raw'; .\_tmp\qs.exe render https://raw.githubusercontent.com/yuanboshe/qs-repo/test-repo/recipe.yaml -o .\_tmp\remote-raw.sh
+$env:QS_HOME=(Resolve-Path _tmp).Path + '\qs-remote-smoke-git'; .\_tmp\qs.exe render git+https://github.com/yuanboshe/qs-repo.git@test-repo -o .\_tmp\remote-git.sh
 ```
 
 关键预期：
@@ -32,4 +41,4 @@ qs explain . --json
 - `fixture/apps/backend/install.sh` 的 `recipe_override` 最终值来自 template 级 recipe 覆盖。
 - `fixture/apps/backend/report.sh` 通过一段写法复用 `apps/backend` 目录上下文。
 - `fixture/apps/frontend/build.sh` 通过多级相对写法解析到 `fixture/apps/frontend/build.sh`。
-- `fixture/legacy/legacy.sh` 同时读取旧式 `arg` 和 `arg/legacy.sh`。
+- `fixture/legacy/legacy.sh` 读取 `legacy/config.yaml.args`，并允许 recipe 覆盖 template 声明参数。
