@@ -1,0 +1,6 @@
+qs:
+  repos:
+    - path: https://github.com/yuanboshe/qs-repo/tree/test-repo
+      name: fixture
+  templates:
+    - fixture/tools/check.sh

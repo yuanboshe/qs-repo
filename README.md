@@ -12,15 +12,12 @@
 - GitHub repo/tree 输入应下载 repo snapshot，并在 `render` / `run` 中默认读取根目录 `recipe.yaml`。
 - GitHub blob/raw `recipe.yaml` 输入在需要 repo 上下文时应下载 repo snapshot，并让 `repos[].path: .` 指向 snapshot 根目录。
 - `git+https://github.com/yuanboshe/qs-repo.git@test-repo` 应默认读取根目录 `recipe.yaml`。
+- `recipes/context.yaml` 用于验证子目录 recipe 依赖 repo 上下文时，`repos[].path: .` 指向 snapshot 根目录。
+- `recipes/remote-repo.yaml` 用于验证单文件 recipe 显式声明远程 repo。
+- `recipes/remote-framework.yaml` 用于验证单文件 recipe 使用远程 framework file source。
 - 隐藏目录、隐藏文件、目录内 `recipe.yaml` 和 `config.yaml` 不应被 `qs inspect` 当成 template。
 
-## 验证命令
-
-在 `quick-setup` 仓库中运行完整远程 smoke harness：
-
-```sh
-$env:QS_REMOTE_SMOKE='1'; go test ./internal/remotesmoke -run TestRemoteInputs -count=1
-```
+## 手动验证命令
 
 本地 fixture 验证：
 
@@ -33,12 +30,15 @@ qs render . -o ./_tmp-fixture.sh
 真实远程验证：
 
 ```sh
-go build -o _tmp\qs.exe .
-$env:QS_HOME=(Resolve-Path _tmp).Path + '\qs-remote-smoke-tree'; .\_tmp\qs.exe inspect https://github.com/yuanboshe/qs-repo/tree/test-repo --json
-$env:QS_HOME=(Resolve-Path _tmp).Path + '\qs-remote-smoke-render'; .\_tmp\qs.exe render https://github.com/yuanboshe/qs-repo/tree/test-repo -o .\_tmp\remote-test-repo.sh
-$env:QS_HOME=(Resolve-Path _tmp).Path + '\qs-remote-smoke-blob'; .\_tmp\qs.exe render https://github.com/yuanboshe/qs-repo/blob/test-repo/recipe.yaml -o .\_tmp\remote-blob.sh
-$env:QS_HOME=(Resolve-Path _tmp).Path + '\qs-remote-smoke-raw'; .\_tmp\qs.exe render https://raw.githubusercontent.com/yuanboshe/qs-repo/test-repo/recipe.yaml -o .\_tmp\remote-raw.sh
-$env:QS_HOME=(Resolve-Path _tmp).Path + '\qs-remote-smoke-git'; .\_tmp\qs.exe render git+https://github.com/yuanboshe/qs-repo.git@test-repo -o .\_tmp\remote-git.sh
+qs inspect https://github.com/yuanboshe/qs-repo/tree/test-repo --json
+qs render https://github.com/yuanboshe/qs-repo/tree/test-repo
+qs render https://github.com/yuanboshe/qs-repo/blob/test-repo/recipe.yaml
+qs render https://raw.githubusercontent.com/yuanboshe/qs-repo/test-repo/recipe.yaml
+qs render https://github.com/yuanboshe/qs-repo/blob/test-repo/recipes/context.yaml
+qs render https://raw.githubusercontent.com/yuanboshe/qs-repo/test-repo/recipes/remote-repo.yaml
+qs render https://raw.githubusercontent.com/yuanboshe/qs-repo/test-repo/recipes/remote-framework.yaml
+qs render git+https://github.com/yuanboshe/qs-repo.git@test-repo
+qs render git+https://github.com/yuanboshe/qs-repo.git@test-repo//recipe.yaml
 ```
 
 关键预期：

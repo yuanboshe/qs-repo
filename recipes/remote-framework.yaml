@@ -1,0 +1,7 @@
+qs:
+  repos:
+    - path: https://github.com/yuanboshe/qs-repo/tree/test-repo
+      name: fixture
+  framework: https://raw.githubusercontent.com/yuanboshe/qs-repo/test-repo/framework.sh
+  templates:
+    - fixture/apps/backend/report.sh
