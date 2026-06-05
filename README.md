@@ -16,6 +16,12 @@
 
 ## 验证命令
 
+在 `quick-setup` 仓库中运行完整远程 smoke harness：
+
+```sh
+$env:QS_REMOTE_SMOKE='1'; go test ./internal/remotesmoke -run TestRemoteInputs -count=1
+```
+
 本地 fixture 验证：
 
 ```sh
