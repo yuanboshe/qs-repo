@@ -217,6 +217,10 @@ docker_install_main() {
 
   if command -v docker >/dev/null 2>&1; then
     docker_install_log "检测到已安装 Docker：$(docker --version)"
+    docker_install_enable_service
+    docker_install_configure_group
+    docker_install_log "Docker Engine 已安装，已检查服务和 docker 组配置"
+    return 0
   fi
 
   docker_install_setup_repo "$(docker_install_arch)"
