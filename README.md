@@ -43,7 +43,7 @@ repo/docker/verify_docker.sh:
 
 ### Docker Hub mirror 自动测速
 
-国内服务器拉取 Docker Hub image 时，固定写死某个 mirror 不可靠：公开列表只能作为候选池，某个源是否可用、是否快，必须以目标主机当时的实时测试为准。`docker/configure_docker_daemon.sh` 在 `registry_mirrors: auto` 时会测试候选源的 `/v2/` 和 `library/<test-image>:latest` manifest，按多轮请求耗时中位数排序，只把最快 Top N 写入 `registry-mirrors`。
+国内服务器拉取 Docker Hub image 时，固定写死某个 mirror 不可靠：公开列表只能作为候选池，某个源是否可用、是否快，必须以目标主机当时的实时测试为准。`docker/configure_docker_daemon.sh` 在 `registry_mirrors: auto` 时会先测试 Docker Hub 直连，再测试候选源的 `/v2/` 和 `library/<test-image>:latest` manifest，按多轮请求耗时中位数排序。只有直连失败，或 mirror 至少比直连快 `20%`（可通过 `--min-speedup-percent` 调整）时，才把最快 Top N 写入 `registry-mirrors`；否则移除该字段，保持 Docker Hub 直连。
 
 脚本安全边界：
 
@@ -53,7 +53,7 @@ repo/docker/verify_docker.sh:
 - 写入后执行 `systemctl daemon-reload`、`systemctl restart docker`、`docker info` 和 `docker pull <verify-image>`。
 - 重启、`docker info` 或 pull 验证失败时，自动恢复最近备份并重启 Docker。
 - 内置候选源只是 fallback；复杂排查时可通过脚本 CLI 传入 `--candidate-file`、`--remote-url` 或位置参数追加候选源。
-- QS 暴露的 template 参数保持精简；`--top`、`--rounds`、`--connect-timeout`、`--max-time` 和 `--test-image` 只作为脚本 CLI 诊断参数，不进入默认 recipe。
+- QS 暴露的 template 参数保持精简；`--top`、`--rounds`、`--min-speedup-percent`、`--connect-timeout`、`--max-time` 和 `--test-image` 只作为脚本 CLI 诊断参数，不进入默认 recipe。
 
 单独 dry-run 测速：
 
@@ -69,6 +69,7 @@ sudo ./docker/configure_docker_daemon.sh \
   --candidate-file ./mirror_candidates.txt \
   --top 3 \
   --rounds 3 \
+  --min-speedup-percent 20 \
   --test-image alpine \
   --verify-image hello-world \
   --yes

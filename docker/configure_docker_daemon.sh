@@ -7,7 +7,7 @@
 # @effects network-probe system-file:/etc/docker/daemon.json backup-file service-restart docker-pull
 # @network docker.io docker.xuanyuan.me docker.1ms.run docker.1panel.live docker.m.daocloud.io hub.rat.dev dockerproxy.net
 
-# @arg Docker registry mirrors；auto 表示实时测速并写入最快源；none 或空值表示移除 registry-mirrors；也可填逗号分隔的固定 mirror
+# @arg Docker registry mirrors；auto 表示先测 Docker Hub 直连，再仅在 mirror 明显更快或直连失败时写入最快源；none 或空值表示移除 registry-mirrors；也可填逗号分隔的固定 mirror
 REGISTRY_MIRRORS="auto"
 # @arg Docker json-file 日志单文件最大大小
 LOG_MAX_SIZE="100m"
@@ -19,6 +19,8 @@ LIVE_RESTORE="true"
 RESTART_DOCKER="true"
 # @arg Docker Hub mirror 候选池，多个地址可用逗号、空白或换行分隔；最终是否写入以目标主机实时测速为准
 MIRROR_CANDIDATES="https://docker.xuanyuan.me,https://docker.1ms.run,https://docker.1panel.live,https://docker.m.daocloud.io,https://hub.rat.dev,https://dockerproxy.net"
+# @arg auto 模式下 mirror 至少比 Docker Hub 直连快多少百分比才写入；0 表示只要更快就写入
+MIRROR_MIN_SPEEDUP_PERCENT="20"
 # @arg 更新后用于 docker pull 验证的镜像；none 表示跳过 pull 验证
 MIRROR_VERIFY_IMAGE="hello-world"
 # @arg 非交互确认；QS 自动部署时可在 recipe 中覆盖为 true
@@ -34,6 +36,7 @@ MIRROR_CONNECT_TIMEOUT="3"
 MIRROR_MAX_TIME="10"
 MIRROR_TEST_IMAGE="alpine"
 MIRROR_DRY_RUN="false"
+MIRROR_DIRECT_REGISTRY="https://registry-1.docker.io"
 
 declare -a DOCKER_DAEMON_POSITIONAL_CANDIDATES=()
 declare -a DOCKER_DAEMON_CANDIDATES=()
@@ -47,6 +50,9 @@ DOCKER_DAEMON_HAD_FILE="false"
 DOCKER_DAEMON_LAST_TIME=""
 DOCKER_DAEMON_LAST_REASON=""
 DOCKER_DAEMON_LAST_CLASS=""
+DOCKER_DAEMON_DIRECT_OK="false"
+DOCKER_DAEMON_DIRECT_TIME=""
+DOCKER_DAEMON_EFFECTIVE_MIRROR_MODE=""
 DOCKER_DAEMON_DOCKER_USE_SUDO="false"
 DOCKER_DAEMON_SELF_TEST="false"
 DOCKER_DAEMON_SHOW_HELP="false"
@@ -78,6 +84,7 @@ Options:
   --remote-url URL            read remote candidate mirror list
   --top N                     select fastest top N mirrors, default 3
   --rounds N                  probe rounds for each mirror, default 3
+  --min-speedup-percent N     mirror must be at least N% faster than direct Docker Hub, default 20
   --connect-timeout SECONDS   curl connect timeout, default 3
   --max-time SECONDS          curl max time, default 10
   --test-image IMAGE          manifest test image, default alpine
@@ -154,6 +161,11 @@ docker_daemon_parse_args() {
       MIRROR_ROUNDS="$2"
       shift 2
       ;;
+    --min-speedup-percent)
+      [ "$#" -ge 2 ] || docker_daemon_die "--min-speedup-percent 需要参数"
+      MIRROR_MIN_SPEEDUP_PERCENT="$2"
+      shift 2
+      ;;
     --connect-timeout)
       [ "$#" -ge 2 ] || docker_daemon_die "--connect-timeout 需要参数"
       MIRROR_CONNECT_TIMEOUT="$2"
@@ -224,6 +236,14 @@ docker_daemon_validate_positive_number() {
   fi
 }
 
+docker_daemon_validate_nonnegative_number() {
+  local name="$1"
+  local value="$2"
+  if ! [[ "${value}" =~ ^[0-9]+([.][0-9]+)?$ ]]; then
+    docker_daemon_die "${name} 必须是非负数，当前值：${value}"
+  fi
+}
+
 docker_daemon_validate_bool() {
   local name="$1"
   local value="$2"
@@ -242,6 +262,7 @@ docker_daemon_validate_args() {
   docker_daemon_validate_positive_int "MIRROR_ROUNDS" "${MIRROR_ROUNDS}"
   docker_daemon_validate_positive_number "MIRROR_CONNECT_TIMEOUT" "${MIRROR_CONNECT_TIMEOUT}"
   docker_daemon_validate_positive_number "MIRROR_MAX_TIME" "${MIRROR_MAX_TIME}"
+  docker_daemon_validate_nonnegative_number "MIRROR_MIN_SPEEDUP_PERCENT" "${MIRROR_MIN_SPEEDUP_PERCENT}"
 }
 
 docker_daemon_mirror_mode() {
@@ -515,6 +536,43 @@ docker_daemon_probe_candidates() {
   done
 }
 
+docker_daemon_probe_direct() {
+  local round median
+  local -a times=()
+
+  docker_daemon_log "测试 Docker Hub 直连：${MIRROR_DIRECT_REGISTRY}"
+  DOCKER_DAEMON_DIRECT_OK="false"
+  DOCKER_DAEMON_DIRECT_TIME=""
+
+  for ((round = 1; round <= MIRROR_ROUNDS; round++)); do
+    if docker_daemon_probe_once "${MIRROR_DIRECT_REGISTRY}"; then
+      times+=("${DOCKER_DAEMON_LAST_TIME}")
+    else
+      echo "[DIRECT FAIL] ${MIRROR_DIRECT_REGISTRY} reason=${DOCKER_DAEMON_LAST_REASON}"
+      return 0
+    fi
+  done
+
+  median="$(docker_daemon_median "${times[@]}")"
+  DOCKER_DAEMON_DIRECT_OK="true"
+  DOCKER_DAEMON_DIRECT_TIME="${median}"
+  printf '[DIRECT OK] %s median=%ss\n' "${MIRROR_DIRECT_REGISTRY}" "${median}"
+}
+
+docker_daemon_mirror_is_faster_than_direct() {
+  docker_daemon_python "${DOCKER_DAEMON_DIRECT_TIME}" "${MIRROR_MIN_SPEEDUP_PERCENT}" "$1" <<'PY'
+import sys
+
+direct = float(sys.argv[1])
+speedup = float(sys.argv[2])
+mirror = float(sys.argv[3])
+threshold = direct * (100.0 - speedup) / 100.0
+if speedup == 0:
+    sys.exit(0 if mirror < direct else 1)
+sys.exit(0 if mirror <= threshold else 1)
+PY
+}
+
 docker_daemon_select_results() {
   local -a sorted=()
   local line mirror median index
@@ -530,6 +588,11 @@ docker_daemon_select_results() {
   for line in "${sorted[@]}"; do
     mirror="${line%%|*}"
     median="${line##*|}"
+    if [ "${DOCKER_DAEMON_DIRECT_OK}" = "true" ] && ! docker_daemon_mirror_is_faster_than_direct "${median}"; then
+      printf '[SKIP] %s median=%ss not at least %s%% faster than Docker Hub direct median=%ss\n' \
+        "${mirror}" "${median}" "${MIRROR_MIN_SPEEDUP_PERCENT}" "${DOCKER_DAEMON_DIRECT_TIME}"
+      continue
+    fi
     index=$((index + 1))
     if [ "${index}" -le "${MIRROR_TOP}" ]; then
       DOCKER_DAEMON_SELECTED_MIRRORS+=("${mirror}")
@@ -542,16 +605,26 @@ docker_daemon_resolve_mirrors() {
   local mode="$1"
   case "${mode}" in
   auto)
+    docker_daemon_probe_direct
     docker_daemon_collect_candidates
     docker_daemon_probe_candidates
     docker_daemon_select_results
-    [ "${#DOCKER_DAEMON_SELECTED_MIRRORS[@]}" -gt 0 ] || docker_daemon_die "没有通过实时测试的 Docker Hub mirror，未修改 daemon.json"
+    if [ "${#DOCKER_DAEMON_SELECTED_MIRRORS[@]}" -gt 0 ]; then
+      DOCKER_DAEMON_EFFECTIVE_MIRROR_MODE="auto"
+    elif [ "${DOCKER_DAEMON_DIRECT_OK}" = "true" ]; then
+      DOCKER_DAEMON_EFFECTIVE_MIRROR_MODE="remove"
+      docker_daemon_log "Docker Hub 直连可用，且没有 mirror 达到明显更快阈值；将不配置 registry-mirrors"
+    else
+      docker_daemon_die "Docker Hub 直连失败，且没有通过实时测试的 Docker Hub mirror，未修改 daemon.json"
+    fi
     ;;
   static)
     docker_daemon_static_mirrors
+    DOCKER_DAEMON_EFFECTIVE_MIRROR_MODE="static"
     ;;
   remove)
     docker_daemon_log "将移除 registry-mirrors 字段"
+    DOCKER_DAEMON_EFFECTIVE_MIRROR_MODE="remove"
     ;;
   esac
 }
@@ -761,6 +834,18 @@ docker_daemon_self_test() {
   total="$(docker_daemon_sum_times 0.100 0.250)"
   [ "${total}" = "0.350000" ] || docker_daemon_die "self-test time sum failed: ${total}"
 
+  DOCKER_DAEMON_DIRECT_TIME="1.000"
+  MIRROR_MIN_SPEEDUP_PERCENT="20"
+  docker_daemon_mirror_is_faster_than_direct "0.800" || docker_daemon_die "self-test speedup threshold failed"
+  if docker_daemon_mirror_is_faster_than_direct "0.810"; then
+    docker_daemon_die "self-test speedup threshold false positive"
+  fi
+  MIRROR_MIN_SPEEDUP_PERCENT="0"
+  docker_daemon_mirror_is_faster_than_direct "0.999" || docker_daemon_die "self-test zero speedup threshold failed"
+  if docker_daemon_mirror_is_faster_than_direct "1.000"; then
+    docker_daemon_die "self-test zero speedup threshold false positive"
+  fi
+
   cat >"${candidates_file}" <<'EOF'
 # comment
 https://a.example/
@@ -819,6 +904,7 @@ docker_daemon_main() {
   mirror_mode="$(docker_daemon_mirror_mode)"
   docker_daemon_require_dependencies "${mirror_mode}"
   docker_daemon_resolve_mirrors "${mirror_mode}"
+  mirror_mode="${DOCKER_DAEMON_EFFECTIVE_MIRROR_MODE}"
 
   if [ "${MIRROR_DRY_RUN}" = "true" ]; then
     docker_daemon_log "dry-run：未修改 daemon.json，未重启 Docker"
