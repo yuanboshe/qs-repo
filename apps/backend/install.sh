@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # @description Fixture: full template ID, multi-level config, template default and recipe overrides.
+# @step Read root, app and backend config.yaml defaults.
+# @step Apply repo, directory and template-level recipe overrides.
 # @platform linux/ubuntu>=24.04 linux/debian>=12
 # @shell bash
 # @requires bash

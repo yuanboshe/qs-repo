@@ -8,3 +8,18 @@ args:
   recipe_override: root-config
   frontend_only: root-config
   legacy_common: root-config
+  empty_value: root-config
+  self_reference_value: root-config
+  install_mode: root-config
+  metadata_note: root-config
+  checksum: root-checksum
+  package: root-package
+metadata:
+  description: Fixture default description from root config.
+  platform:
+    - linux/generic
+  shell: bash
+  requires:
+    - bash
+  effects:
+    - fixture-root-default

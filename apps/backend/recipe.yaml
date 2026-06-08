@@ -1,3 +1,11 @@
 qs:
+  description: Component-local recipe used to prove nested recipe.yaml is not indexed as a template but is renderable when addressed directly.
+  repos:
+    - path: .
+      name: fixture
+  framework: framework.sh
   templates:
-    - should-not-be-listed.sh
+    - fixture/apps/backend/report.sh
+
+fixture/apps/backend/report.sh:
+  report_mode: component-recipe-report

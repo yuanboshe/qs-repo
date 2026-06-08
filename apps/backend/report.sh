@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # @description Fixture: one-segment template ID reuses previous repo and template directory.
+# @step Reuse apps/backend context from the previous template ID.
+# @step Print recipe-level report mode override.
 # @platform linux/ubuntu>=24.04 linux/debian>=12
 # @shell bash
 # @requires bash

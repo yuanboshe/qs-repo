@@ -1,0 +1,7 @@
+qs:
+  description: Recipe that declares a git+ repo source inside a remote recipe file.
+  repos:
+    - path: git+https://github.com/yuanboshe/qs-repo.git@test-repo
+      name: fixture
+  templates:
+    - fixture/tools/check.sh

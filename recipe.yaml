@@ -1,4 +1,5 @@
 qs:
+  description: Root remote fixture for GitHub tree, repo URL, raw recipe and git+ default recipe inputs.
   repos:
     - path: .
       name: fixture
@@ -8,6 +9,7 @@ qs:
     - report.sh
     - apps/frontend/build.sh
     - tools/check.sh
+    - install.sh
     - legacy/legacy.sh
 
 fixture:
@@ -29,6 +31,10 @@ fixture/apps/backend/report.sh:
 
 fixture/apps/frontend/build.sh:
   frontend_only: recipe-frontend
+
+fixture/tools/install.sh:
+  self_reference_value: recipe-tools-self
+  install_mode: recipe-tools
 
 fixture/legacy/legacy.sh:
   legacy_recipe: recipe-legacy

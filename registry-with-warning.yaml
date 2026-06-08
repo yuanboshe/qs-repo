@@ -1,0 +1,4 @@
+version: 1
+repos:
+  - source: https://github.com/yuanboshe/qs-repo/tree/test-repo
+  - source: git+https://github.com/yuanboshe/qs-repo.git@test-repo//recipe.yaml

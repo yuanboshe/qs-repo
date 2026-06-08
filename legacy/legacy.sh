@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # @description Fixture: legacy arg and arg/template config compatibility.
+# @step Read implicit self-reference args.
+# @step Apply legacy/config.yaml and recipe overrides.
 # @platform linux/ubuntu>=24.04 linux/debian>=12
 # @shell bash
 # @requires bash

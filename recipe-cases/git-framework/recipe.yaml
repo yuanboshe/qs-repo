@@ -1,0 +1,12 @@
+qs:
+  description: Recipe that resolves framework.sh through a git+ framework source.
+  repos:
+    - path: https://github.com/yuanboshe/qs-repo/tree/test-repo
+      name: fixture
+  framework: git+https://github.com/yuanboshe/qs-repo.git@test-repo//framework.sh
+  templates:
+    - fixture/tools/install.sh
+
+fixture/tools/install.sh:
+  self_reference_value: git-framework-recipe
+  install_mode: git-framework

@@ -1,0 +1,18 @@
+qs:
+  description: Select templates from two repo roots and then reuse the secondary repo context.
+  repos:
+    - path: .
+      name: fixture
+    - path: fixtures/secondary-repo
+      name: secondary
+  framework: framework.sh
+  templates:
+    - fixture/tools/check.sh
+    - secondary/tools/check.sh
+    - install.sh
+
+secondary:
+  secondary_value: recipe-secondary
+
+secondary/tools/install.sh:
+  secondary_install_mode: recipe-secondary-install

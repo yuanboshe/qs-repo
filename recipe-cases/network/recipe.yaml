@@ -1,0 +1,11 @@
+qs:
+  description: Render a network-aware fixture without performing network IO.
+  repos:
+    - path: .
+      name: fixture
+  framework: framework.sh
+  templates:
+    - fixture/network/fetch.sh
+
+fixture/network/fetch.sh:
+  checksum: recipe-checksum

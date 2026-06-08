@@ -1,0 +1,12 @@
+qs:
+  description: Inspect metadata inheritance, empty metadata list override and platform filters.
+  repos:
+    - path: .
+      name: fixture
+  framework: framework.sh
+  templates:
+    - fixture/apps/backend/config_metadata.sh
+    - platforms/alpine/install.sh
+
+fixture/apps/backend/config_metadata.sh:
+  metadata_note: recipe-metadata

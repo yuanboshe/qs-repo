@@ -1,0 +1,11 @@
+args:
+  package: busybox-extras
+
+metadata:
+  platform:
+    - linux/alpine>=3.19
+  shell: sh
+  requires:
+    - apk
+  effects:
+    - package-install

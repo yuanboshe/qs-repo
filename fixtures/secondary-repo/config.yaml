@@ -1,0 +1,13 @@
+args:
+  secondary_value: secondary-config
+  secondary_install_mode: secondary-config
+
+metadata:
+  description: Fixture secondary repo config default.
+  platform:
+    - linux/ubuntu>=22.04
+  shell: bash
+  requires:
+    - bash
+  effects:
+    - secondary-repo-effect

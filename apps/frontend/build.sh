@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # @description Fixture: multi-level relative template ID without explicit repo name.
+# @step Resolve apps/frontend/build.sh with an inferred repo name.
+# @step Print app-level and root-level defaults.
 # @platform linux/ubuntu>=24.04 linux/debian>=12
 # @shell bash
 # @requires bash

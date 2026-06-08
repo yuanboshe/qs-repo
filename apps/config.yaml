@@ -4,3 +4,12 @@ args:
   backend_only: apps-config
   dir_only: apps-config
   frontend_only: apps-config
+metadata:
+  platform: linux/ubuntu>=24.04 linux/debian>=12
+  shell: bash
+  requires: bash awk
+  effects:
+    - app-config-effect
+  network:
+    - apps.fixture.invalid
+    - cdn.fixture.invalid

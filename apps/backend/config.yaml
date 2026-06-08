@@ -5,3 +5,14 @@ args:
   recipe_override: backend-config
   template_only: backend-config
   report_mode: backend-config
+  metadata_note: backend-config
+  empty_value: backend-config
+  self_reference_value: backend-config
+metadata:
+  description: "Fixture: metadata description inherited from apps/backend/config.yaml."
+  requires:
+    - bash
+    - jq
+  effects:
+    - backend-config-effect
+  network: []
