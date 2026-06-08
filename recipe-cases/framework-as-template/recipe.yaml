@@ -1,5 +1,5 @@
 qs:
-  description: Negative fixture: @qs framework file must not be accepted as a template.
+  description: "Negative fixture: @qs framework file must not be accepted as a template."
   repos:
     - path: .
       name: fixture
