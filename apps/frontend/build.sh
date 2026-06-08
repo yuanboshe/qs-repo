@@ -1,4 +1,5 @@
 #!/bin/bash
+# @qs template
 
 # @description Fixture: multi-level relative template ID without explicit repo name.
 # @step Resolve apps/frontend/build.sh with an inferred repo name.

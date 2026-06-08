@@ -1,4 +1,5 @@
 #!/bin/bash
+# @qs template
 
 # @description Fixture: secondary repo template for multi-repo recipes.
 # @step Prove a recipe can select templates from a second repo path.

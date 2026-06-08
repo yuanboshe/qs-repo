@@ -1,4 +1,5 @@
 #!/bin/bash
+# @qs template
 
 # @description Fixture: legacy arg and arg/template config compatibility.
 # @step Read implicit self-reference args.

@@ -1,4 +1,5 @@
 #!/bin/sh
+# @qs template
 
 # @description Fixture: platform-specific sh template for inspect filters.
 # @step Show a package selected through directory config.

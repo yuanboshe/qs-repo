@@ -1,0 +1,3 @@
+version: 1
+repos:
+  - source: git+https://github.com/yuanboshe/qs-repo.git@test-repo

@@ -1,4 +1,5 @@
 #!/bin/bash
+# @qs template
 
 # @description Fixture: duplicate install basename and argument edge cases.
 # @step Preserve an explicit empty string default over config.yaml defaults.

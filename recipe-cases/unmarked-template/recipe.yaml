@@ -1,0 +1,8 @@
+qs:
+  description: Negative fixture: helper without @qs template must not be accepted as a template.
+  repos:
+    - path: .
+      name: fixture
+  framework: framework.sh
+  templates:
+    - fixture/helpers/internal.sh

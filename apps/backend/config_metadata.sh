@@ -1,4 +1,5 @@
 #!/bin/bash
+# @qs template
 
 # @step Read platform and shell metadata from parent config.yaml files.
 # @step Read requires and effects from apps/backend/config.yaml.

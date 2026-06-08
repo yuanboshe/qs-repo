@@ -1,4 +1,5 @@
 #!/bin/bash
+# @qs template
 
 # @description Fixture: network metadata and download argument review.
 # @step Resolve a download URL without performing network IO.

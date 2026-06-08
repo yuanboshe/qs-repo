@@ -1,4 +1,5 @@
 #!/bin/bash
+# @qs template
 
 # @description Fixture: one-segment template ID reuses previous repo and template directory.
 # @step Reuse apps/backend context from the previous template ID.

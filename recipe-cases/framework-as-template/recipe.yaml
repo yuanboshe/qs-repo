@@ -1,0 +1,8 @@
+qs:
+  description: Negative fixture: @qs framework file must not be accepted as a template.
+  repos:
+    - path: .
+      name: fixture
+  framework: framework.sh
+  templates:
+    - fixture/frameworks/strict.sh

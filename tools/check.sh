@@ -1,4 +1,5 @@
 #!/bin/bash
+# @qs template
 
 # @description Fixture: template under a directory without local config.yaml.
 # @step Confirm root config.yaml is still visible.

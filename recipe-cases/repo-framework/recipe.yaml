@@ -1,0 +1,8 @@
+qs:
+  description: Recipe that resolves a repo-relative framework file under frameworks/.
+  repos:
+    - path: .
+      name: fixture
+  framework: fixture/frameworks/strict.sh
+  templates:
+    - fixture/tools/check.sh

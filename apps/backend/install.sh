@@ -1,4 +1,5 @@
 #!/bin/bash
+# @qs template
 
 # @description Fixture: full template ID, multi-level config, template default and recipe overrides.
 # @step Read root, app and backend config.yaml defaults.

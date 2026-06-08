@@ -1,4 +1,5 @@
 #!/bin/bash
+# @qs template
 
 # @description Fixture: one-segment template reuse inside a secondary repo.
 # @step Reuse secondary/tools after secondary/tools/check.sh.
