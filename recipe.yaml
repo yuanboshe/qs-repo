@@ -1,0 +1,17 @@
+qs:
+  description: QS environment smoke and diagnostics recipe.
+  repos:
+    - path: .
+      name: qs-repo
+  framework: framework.sh
+  templates:
+    - qs-repo/qs/smoke.sh
+    - qs-repo/diagnostics/ghx_registry_config.sh
+
+qs-repo/qs/smoke.sh:
+  qs_smoke_output: _tmp/qs-repo-smoke-rendered.sh
+  qs_search_query: qs
+
+qs-repo/diagnostics/ghx_registry_config.sh:
+  qs_registry_source: ./registry.yaml
+  qs_diagnostic_query: qs
